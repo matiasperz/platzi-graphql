@@ -1,5 +1,5 @@
 'use scrict'
-
+const cors = require('cors');
 require('dotenv').config();
 const { makeExecutableSchema } = require('graphql-tools')
 const express = require('express')
@@ -12,6 +12,7 @@ const resolvers = require('./lib/resolvers')
 
 const app = express()
 const port = process.env.port || 3000
+const isDev = process.env.NODE_ENV !== 'production'
 
 // Definiendo el esquema
 const typeDefs = readFileSync(
@@ -24,10 +25,12 @@ const schema = makeExecutableSchema(
   }
 )
 
+app.use(cors());
+
 app.use('/api', gqlMiddleware({
   schema: schema,
   rootValue: resolvers,
-  graphiql: true
+  graphiql: isDev
 }))
 
 app.listen(port, () => {
